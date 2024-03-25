@@ -42,11 +42,8 @@ class RNN_model(nn.Module):
         self.word_embedding_dim = embedding_dim
         self.lstm_dim = lstm_hidden_dim
         #########################################
-        # here you need to define the "self.rnn_lstm"  the input size is "embedding_dim" and the output size is "lstm_hidden_dim"
-        # the lstm should have two layers, and the  input and output tensors are provided as (batch, seq, feature)
-        # ???
-
-
+        # Define the LSTM layers
+        self.rnn_lstm = nn.LSTM(input_size=embedding_dim, hidden_size=lstm_hidden_dim, num_layers=2, batch_first=True)
 
         ##########################################
         self.fc = nn.Linear(lstm_hidden_dim, vocab_len )
@@ -56,14 +53,10 @@ class RNN_model(nn.Module):
         # self.tanh = nn.Tanh()
     def forward(self,sentence,is_test = False):
         batch_input = self.word_embedding_lookup(sentence).view(1,-1,self.word_embedding_dim)
-        # print(batch_input.size()) # print the size of the input
+        # Pass input to LSTM
+        output, (hidden, cell) = self.rnn_lstm(batch_input)
         ################################################
-        # here you need to put the "batch_input"  input the self.lstm which is defined before.
-        # the hidden output should be named as output, the initial hidden state and cell state set to zero.
-        # ???
-
-
-
+        # No need to define "output" here since it's already defined in the LSTM layer
 
         ################################################
         out = output.contiguous().view(-1,self.lstm_dim)
@@ -77,6 +70,4 @@ class RNN_model(nn.Module):
             output = prediction
         else:
            output = out
-        # print(out)
         return output
-
